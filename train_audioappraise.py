@@ -36,9 +36,8 @@ def train_process(config):
     # grab the list of images in our dataset directory, then initialize
     # the list of data (i.e., images) and class images
     print("[INFO] loading images...")
-    # imagePaths = list(paths.list_images(args["dataset"]))
     imagePaths = list(paths.list_images(config.dataset))
-    #print("imagePaths: ", imagePaths)
+    # print("imagePaths: ", imagePaths)
     data = []
     labels = []
 
@@ -108,12 +107,10 @@ def train_process(config):
                                 predictions.argmax(axis=1), target_names=le.classes_))
 
     # save the network to disk
-    # print("[INFO] serializing network to '{}'...".format(args["model"]))
     print("[INFO] serializing network to '{}'...".format(config.model))
-    # model.save(args["model"])
     model.save(config.model)
     model.save_weights('./weights/audioappraisenet_weights.h5')
-    #model.load_weights('./weights/audioappraisenet_weights.h5')
+    # model.load_weights('./weights/audioappraisenet_weights.h5')
     # print model info as json/yaml
     # json_strig = model.to_json()
     # print("json_strig: ", json_strig)
@@ -128,7 +125,6 @@ def train_process(config):
     # print("intermediate_output: --------> ", intermediate_output)
 
     # save the label encoder to disk
-    # f = open(args["le"], "wb")
     f = open(config.le, "wb")
     f.write(pickle.dumps(le, True))
     f.close()
@@ -167,7 +163,6 @@ def train_process(config):
     plt.xlabel("Epoch #")
     plt.ylabel("Loss/Accuracy")
     plt.legend(loc="lower left")
-    # plt.savefig(args["plot"])
     plt.savefig(config.plot)
 
 if __name__ == '__main__':
@@ -181,7 +176,6 @@ if __name__ == '__main__':
                     help="path to label encoder")
     parser.add_argument("-p", "--plot", type=str, default="plot.png",
                     help="path to output loss/accuracy plot")
-    #args = vars(parser.parse_args())
 
     config = parser.parse_args()
     train_process(config)
