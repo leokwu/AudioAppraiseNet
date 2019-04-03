@@ -77,6 +77,7 @@ data = np.array(data, dtype="float") / 255.0
 le = LabelEncoder()
 labels = le.fit_transform(labels)
 labels = np_utils.to_categorical(labels, 2)
+#print("\nle: ", le)
 
 # partition the data into training and testing splits using 75% of
 # the data for training and the remaining 25% for testing
@@ -139,7 +140,7 @@ model.save_weights('./weights/audioappraisenet_weights.h5')
 
 # save the label encoder to disk
 f = open(args["le"], "wb")
-f.write(pickle.dumps(le))
+f.write(pickle.dumps(le, True))
 f.close()
 
 print("input is: ", model.input.op.name)
