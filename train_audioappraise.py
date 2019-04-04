@@ -137,7 +137,7 @@ def train_process(config):
     frozen_graph_def = tf.graph_util.convert_variables_to_constants(
         sess,
         sess.graph_def,
-        output_node_names=["activation_6/Softmax"])
+        output_node_names=["activation_8/Softmax"])
     with tf.gfile.GFile('./model/audioappraisenet_model.pb', "wb") as f:
         f.write(frozen_graph_def.SerializeToString())
     # tf.train.write_graph(frozen_graph_def, 'model', 'audioappraisenet_model.pb', as_text=True)
