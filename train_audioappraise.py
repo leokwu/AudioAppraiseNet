@@ -24,14 +24,15 @@ import os
 import tensorflow as tf
 from keras import backend as K
 import keras
+from keras.regularizers import l2
 from keras.models import Model
 # from keras.utils import multi_gpu_model
 
 def train_process(config):
     INIT_LR = 1e-4
     BS = 8
-    # EPOCHS = 50
-    EPOCHS = 1
+    EPOCHS = 50
+    # EPOCHS = 1
 
     # grab the list of images in our dataset directory, then initialize
     # the list of data (i.e., images) and class images
@@ -79,7 +80,7 @@ def train_process(config):
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
     model = AudioAppraiseNet.build(width=32, height=32, depth=3,
-                              classes=len(le.classes_))
+                              classes=len(le.classes_), reg=le(0.0005))
     # model = multi_gpu_model(model, gpus=4)
     model.compile(loss="binary_crossentropy", optimizer=opt,
                   metrics=["accuracy"])
