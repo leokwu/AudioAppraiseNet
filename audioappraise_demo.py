@@ -24,8 +24,6 @@ def inference(config):
 	model = load_model(config.model)
 	le = pickle.loads(open(config.le, "rb").read())
 
-
-	# extract the face ROI and then preproces it in the exact
 	# same manner as our training data
 	frame = cv2.imread(config.picture)
 	f0_frame = cv2.resize(frame, (32, 32))
@@ -33,7 +31,6 @@ def inference(config):
 	f0_frame = img_to_array(f0_frame)
 	f0_frame = np.expand_dims(f0_frame, axis=0)
 
-	# pass the face ROI through the trained liveness detector
 	# model to determine if the f0 is "good" or "bad"
 	preds = model.predict(f0_frame)[0]
 	j = np.argmax(preds)
