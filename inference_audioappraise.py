@@ -1,5 +1,5 @@
 # USAGE
-# python3.6 audioappraise_demo.py --model audioappraise.model --le le.pickle --picture f0.png
+# python3.6 inference_audioappraise.py --model audioappraise.model --le le.pickle --picture f0.png
 
 # import the necessary packages
 from keras.preprocessing.image import img_to_array
@@ -33,8 +33,11 @@ def inference(config):
 
 	# model to determine if the f0 is "good" or "bad"
 	preds = model.predict(f0_frame)[0]
+	print("\npreds: ", model.predict(f0_frame)[0])
 	j = np.argmax(preds)
+	print("\nj: ", j)
 	label = le.classes_[j]
+	print("\nlabel: ", label)
 
 	# draw the label and bounding box on the frame
 	label = "{}: {:.4f}".format(label, preds[j])
