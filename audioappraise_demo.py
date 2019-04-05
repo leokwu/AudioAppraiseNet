@@ -37,14 +37,16 @@ def inference(config):
 	label = le.classes_[j]
 
 	# draw the label and bounding box on the frame
-	label = "{}: {:.4f}".f0_frame(label, preds[j])
+	label = "{}: {:.4f}".format(label, preds[j])
 	cv2.putText(frame, label, (startX, startY - 10),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
 	# show the output frame and wait for a key press
 	cv2.imshow("Picture", frame)
-	key = cv2.waitKey(1) & 0xFF
-
+	while True:
+		key = cv2.waitKey(1) & 0xFF
+		if key == ord("q"):
+			break
 	# do a bit of cleanup
 	cv2.destroyAllWindows()
 
