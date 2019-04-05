@@ -17,8 +17,6 @@ import os
 def inference(config):
 	startX = 20
 	startY = 20
-	endX = 80
-	endY = 80
 	# load the audioappraise  model and label encoder from disk
 	print("[INFO] loading audioappraise ...")
 	model = load_model(config.model)
@@ -41,7 +39,7 @@ def inference(config):
 
 	# draw the label and bounding box on the frame
 	label = "{}: {:.4f}".format(label, preds[j])
-	cv2.putText(frame, label, (startX, startY - 10),
+	cv2.putText(frame, label, (startX, startY),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
 	# show the output frame and wait for a key press
