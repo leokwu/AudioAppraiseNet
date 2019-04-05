@@ -6,12 +6,9 @@ from keras.preprocessing.image import img_to_array
 from keras.models import load_model
 import numpy as np
 import argparse
-import imutils
 import pickle
-import time
 import cv2
-import os
-
+import datetime
 
 
 def inference(config):
@@ -30,14 +27,17 @@ def inference(config):
 	f0_frame = np.expand_dims(f0_frame, axis=0)
 
 	# model to determine if the f0 is "good" or "bad"
+	start_time = datetime.datetime.now()
 	preds = model.predict(f0_frame)[0]
+	end_time = datetime.datetime.now()
+	print("\npredict time ms: ", (start_time - end_time).microseconds/1000)
 	print("\npreds: ", model.predict(f0_frame)[0])
 	j = np.argmax(preds)
 	print("\nj: ", j)
 	label = le.classes_[j]
 	print("\nlabel: ", label)
 
-	# draw the label and bounding box on the frame
+	# draw the label and probability on the frame
 	label = "{}: {:.4f}".format(label, preds[j])
 	cv2.putText(frame, label, (startX, startY),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
