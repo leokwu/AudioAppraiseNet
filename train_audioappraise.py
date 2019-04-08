@@ -1,5 +1,5 @@
 # USAGE
-# python3.6 train_audioappraise.py --dataset dataset --model audioappraise.model --le le.pickle
+# python3.6 train_audioappraise.py --dataset /datasets/f0_classify --model audioappraise.model --le le.pickle
 
 # set the matplotlib backend so figures can be saved in the background
 import matplotlib
@@ -30,7 +30,7 @@ from keras.models import Model
 
 def train_process(config):
     INIT_LR = 1e-4
-    BS = 8
+    BS = 32
     EPOCHS = 50
     # EPOCHS = 1
 
@@ -50,7 +50,7 @@ def train_process(config):
         # print("os.path.sep: ", os.path.sep)
         # print("label: ", label)
         image = cv2.imread(imagePath)
-        image = cv2.resize(image, (32, 32))
+        image = cv2.resize(image, (64, 64))
 
         # update the data and labels lists, respectively
         data.append(image)
@@ -72,14 +72,15 @@ def train_process(config):
                                                       test_size=0.25, random_state=42)
 
     # construct the training image generator for data augmentation
-    aug = ImageDataGenerator(rotation_range=20, zoom_range=0.15,
-                             width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15,
-                             horizontal_flip=True, fill_mode="nearest")
+    aug = ImageDataGenerator()
+    # aug = ImageDataGenerator(rotation_range=20, zoom_range=0.15,
+    #                         width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15,
+    #                         horizontal_flip=True, fill_mode="nearest")
 
     # initialize the optimizer and model
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
-    model = AudioAppraiseNet.build(width=32, height=32, depth=3,
+    model = AudioAppraiseNet.build(width=64, height=64, depth=3,
                               classes=len(le.classes_), reg=l2(0.0004))
     # model = multi_gpu_model(model, gpus=4)
     model.compile(loss="binary_crossentropy", optimizer=opt,

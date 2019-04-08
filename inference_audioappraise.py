@@ -21,7 +21,7 @@ def inference(config):
 
 	# same manner as our training data
 	frame = cv2.imread(config.picture)
-	f0_frame = cv2.resize(frame, (32, 32))
+	f0_frame = cv2.resize(frame, (64, 64))
 	f0_frame = f0_frame.astype("float") / 255.0
 	f0_frame = img_to_array(f0_frame)
 	f0_frame = np.expand_dims(f0_frame, axis=0)
