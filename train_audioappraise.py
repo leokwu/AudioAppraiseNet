@@ -80,7 +80,7 @@ def train_process(config):
     # initialize the optimizer and model
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
-    model = AudioAppraiseNet.build_mobilenetv2  (width=224, height=224, depth=3,
+    model = AudioAppraiseNet.build_mobilenetv2(width=224, height=224, depth=3,
                               classes=len(le.classes_), reg=l2(0.0004))
     # model = multi_gpu_model(model, gpus=4)
     model.compile(loss="binary_crossentropy", optimizer=opt,
@@ -145,12 +145,12 @@ def train_process(config):
     # tf.train.write_graph(frozen_graph_def, 'model', 'audioappraisenet_model.pb', as_text=False)
 
     # Training set accuracy--------------------------------
-    result = model.evaluate(trainX, trainY, batch_size=10000)
+    result = model.evaluate(trainX, trainY, batch_size=10)
     print('\nTrain Acc:', result[1])
     # print('\nTrain Los:', result[0])
 
     # Testing set accuracy---------------------------------
-    result = model.evaluate(testX, testY, batch_size=10000)
+    result = model.evaluate(testX, testY, batch_size=10)
     print('\nTest Acc:', result[1])
     # print('\nTest Los:', result[0])
 

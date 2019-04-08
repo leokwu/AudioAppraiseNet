@@ -68,7 +68,6 @@ class AudioAppraiseNet:
     def build_mobilenetv2(width, height, depth, classes, reg, init="he_normal"):
         inputShape = (height, width, depth)
         chanDim = -1
-
         if K.image_data_format() == "channels_first":
             inputShape = (depth, height, width)
             chanDim = 1
@@ -77,9 +76,15 @@ class AudioAppraiseNet:
         x = base_model.output
         x = GlobalAveragePooling2D()(x)
         x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
         x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.25)(x)
         x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
         x = Dense(512, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.25)(x)
         predictions = Dense(classes, activation='softmax')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         for i, layer in enumerate(base_model.layers):
