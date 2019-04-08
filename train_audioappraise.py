@@ -103,7 +103,7 @@ def train_process(config):
                             steps_per_epoch=len(trainX) // BS,
                             epochs=EPOCHS,
                             workers=10,
-                            use_multiprocessing=True,
+                            # use_multiprocessing=True,
                             callbacks=callbacks)
 
     # evaluate the network
