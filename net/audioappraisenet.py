@@ -1,5 +1,7 @@
 # import the necessary packages
 from keras.models import Sequential
+from keras.models import Model
+from keras.applications.inception_v3 import InceptionV3
 from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
@@ -7,6 +9,8 @@ from keras.layers.core import Activation
 from keras.layers.core import Flatten
 from keras.layers.core import Dropout
 from keras.layers.core import Dense
+from keras.layers import GlobalAveragePooling2D
+from keras.layers import Input
 from keras import backend as K
 
 class AudioAppraiseNet:
@@ -57,4 +61,24 @@ class AudioAppraiseNet:
         model.add(Dense(classes))
         model.add(Activation("softmax"))
 
+        return model
+
+    @staticmethod
+    def build_inceptionv3(width, height, depth, classes, reg, init="he_normal"):
+        inputShape = (height, width, depth)
+        chanDim = -1
+
+        if K.image_data_format() == "channels_first":
+            inputShape = (depth, height, width)
+            chanDim = 1
+        input_tensor = Input(shape=inputShape)
+        base_model = InceptionV3(include_top=True, input_tensor=input_tensor, classes=classes)
+        x = base_model.output
+        x = GlobalAveragePooling2D()(x)
+        x = Flatten()(x)
+        x = Dense(128, kernel_initializer=init, kernel_regularizer=reg)(x)
+        x = Activation('relu')(x)
+        x = Dense(classes)(x)
+        predictions = Activation('softmax')(x)
+        model = Model(inputs=base_model.input, outputs=predictions)
         return model
