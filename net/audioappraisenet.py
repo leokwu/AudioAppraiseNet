@@ -84,7 +84,7 @@ class AudioAppraiseNet:
         x = BatchNormalization()(x)
         x = Dense(512, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
         x = BatchNormalization()(x)
-        x = Dropout(0.25)(x)
+        x = Dropout(0.5)(x)
         predictions = Dense(classes, activation='softmax')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         for i, layer in enumerate(base_model.layers):
