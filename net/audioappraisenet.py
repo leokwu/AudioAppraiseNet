@@ -106,8 +106,12 @@ class AudioAppraiseNet:
         base_model = InceptionV3(include_top=False, weights='imagenet')
         x = base_model.output
         x = GlobalAveragePooling2D()(x)
+        x = Dense(512, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.25)(x)
         x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
         x = BatchNormalization()(x)
+        x = Dropout(0.25)(x)
         x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
         x = BatchNormalization()(x)
         x = Dropout(0.25)(x)

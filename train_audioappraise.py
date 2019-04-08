@@ -31,7 +31,7 @@ from keras.models import Model
 def train_process(config):
     INIT_LR = 1e-4
     BS = 32
-    EPOCHS = 64
+    EPOCHS = 128
     # EPOCHS = 1
 
     # grab the list of images in our dataset directory, then initialize
@@ -50,6 +50,7 @@ def train_process(config):
         # print("os.path.sep: ", os.path.sep)
         # print("label: ", label)
         image = cv2.imread(imagePath)
+        # image = cv2.resize(image, (224, 224)) # mobilenetv2
         image = cv2.resize(image, (224, 224))
 
         # update the data and labels lists, respectively
@@ -68,8 +69,7 @@ def train_process(config):
 
     # partition the data into training and testing splits using 75% of
     # the data for training and the remaining 25% for testing
-    (trainX, testX, trainY, testY) = train_test_split(data, labels,
-                                                      test_size=0.25, random_state=42)
+    (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.25, random_state=42)
 
     # construct the training image generator for data augmentation
     aug = ImageDataGenerator()
@@ -84,7 +84,7 @@ def train_process(config):
     # model = AudioAppraiseNet.build_mobilenetv2(width=224, height=224, depth=3,
     #                           classes=len(le.classes_), reg=l2(0.0004))
     # inceptionv3
-    model = AudioAppraiseNet.build_inceptionv3(width=299, height=299, depth=3,
+    model = AudioAppraiseNet.build_inceptionv3(width=224, height=224, depth=3,
                                                classes=len(le.classes_), reg=l2(0.0004))
     # model = multi_gpu_model(model, gpus=4)
     model.compile(loss="binary_crossentropy", optimizer=opt,
@@ -142,7 +142,7 @@ def train_process(config):
     frozen_graph_def = tf.graph_util.convert_variables_to_constants(
         sess,
         sess.graph_def,
-        output_node_names=["dense_5/Softmax"])
+        output_node_names=["dense_6/Softmax"])
     with tf.gfile.GFile('./model/audioappraisenet_model.pb', "wb") as f:
         f.write(frozen_graph_def.SerializeToString())
     # tf.train.write_graph(frozen_graph_def, 'model', 'audioappraisenet_model.pb', as_text=True)
