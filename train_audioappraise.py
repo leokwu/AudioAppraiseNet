@@ -80,8 +80,12 @@ def train_process(config):
     # initialize the optimizer and model
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
-    model = AudioAppraiseNet.build_mobilenetv2(width=224, height=224, depth=3,
-                              classes=len(le.classes_), reg=l2(0.0004))
+    # mobilenetv2
+    # model = AudioAppraiseNet.build_mobilenetv2(width=224, height=224, depth=3,
+    #                           classes=len(le.classes_), reg=l2(0.0004))
+    # inceptionv3
+    model = AudioAppraiseNet.build_inceptionv3(width=299, height=299, depth=3,
+                                               classes=len(le.classes_), reg=l2(0.0004))
     # model = multi_gpu_model(model, gpus=4)
     model.compile(loss="binary_crossentropy", optimizer=opt,
                   metrics=["accuracy"])

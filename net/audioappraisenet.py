@@ -94,3 +94,34 @@ class AudioAppraiseNet:
         for layer in model.layers[11:]:
             layer.trainable = True
         return model
+
+    @staticmethod
+    def build_inceptionv3(width, height, depth, classes, reg, init="he_normal"):
+        inputShape = (height, width, depth)
+        chanDim = -1
+        if K.image_data_format() == "channels_first":
+            inputShape = (depth, height, width)
+            chanDim = 1
+        input_tensor = Input(shape=inputShape)
+        base_model = InceptionV3(include_top=False, weights='imagenet')
+        x = base_model.output
+        x = GlobalAveragePooling2D()(x)
+        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.25)(x)
+        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dense(512, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.5)(x)
+        predictions = Dense(classes, activation='softmax')(x)
+        model = Model(inputs=base_model.input, outputs=predictions)
+        for i, layer in enumerate(base_model.layers):
+            print(i, layer.name)
+        for layer in model.layers[:249]:
+            layer.trainable = False
+        for layer in model.layers[249:]:
+            layer.trainable = True
+        return model
