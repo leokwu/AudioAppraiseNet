@@ -50,7 +50,7 @@ def train_process(config):
         # print("os.path.sep: ", os.path.sep)
         # print("label: ", label)
         image = cv2.imread(imagePath)
-        image = cv2.resize(image, (64, 64))
+        image = cv2.resize(image, (224, 224))
 
         # update the data and labels lists, respectively
         data.append(image)
@@ -80,7 +80,7 @@ def train_process(config):
     # initialize the optimizer and model
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
-    model = AudioAppraiseNet.build(width=64, height=64, depth=3,
+    model = AudioAppraiseNet.build_mobilenetv2  (width=224, height=224, depth=3,
                               classes=len(le.classes_), reg=l2(0.0004))
     # model = multi_gpu_model(model, gpus=4)
     model.compile(loss="binary_crossentropy", optimizer=opt,
@@ -145,7 +145,7 @@ def train_process(config):
     # tf.train.write_graph(frozen_graph_def, 'model', 'audioappraisenet_model.pb', as_text=False)
 
     # Training set accuracy--------------------------------
-    result = model.evaluate(trainX, trainY, batch_size=10)
+    result = model.evaluate(trainX, trainY, batch_size=10000)
     print('\nTrain Acc:', result[1])
     # print('\nTrain Los:', result[0])
 

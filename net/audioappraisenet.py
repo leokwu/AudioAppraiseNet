@@ -2,6 +2,7 @@
 from keras.models import Sequential
 from keras.models import Model
 from keras.applications.inception_v3 import InceptionV3
+from keras.applications.mobilenet_v2 import MobileNetV2
 from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
@@ -64,7 +65,7 @@ class AudioAppraiseNet:
         return model
 
     @staticmethod
-    def build_inceptionv3(width, height, depth, classes, reg, init="he_normal"):
+    def build_mobilenetv2(width, height, depth, classes, reg, init="he_normal"):
         inputShape = (height, width, depth)
         chanDim = -1
 
@@ -72,13 +73,19 @@ class AudioAppraiseNet:
             inputShape = (depth, height, width)
             chanDim = 1
         input_tensor = Input(shape=inputShape)
-        base_model = InceptionV3(include_top=True, input_tensor=input_tensor, classes=classes)
+        base_model = MobileNetV2(include_top=False, weights='imagenet')
         x = base_model.output
         x = GlobalAveragePooling2D()(x)
-        x = Flatten()(x)
-        x = Dense(128, kernel_initializer=init, kernel_regularizer=reg)(x)
-        x = Activation('relu')(x)
-        x = Dense(classes)(x)
-        predictions = Activation('softmax')(x)
+        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = Dense(512, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        predictions = Dense(classes, activation='softmax')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
+        for i, layer in enumerate(base_model.layers):
+            print(i, layer.name)
+        for layer in model.layers[:11]:
+            layer.trainable = False
+        for layer in model.layers[11:]:
+            layer.trainable = True
         return model
