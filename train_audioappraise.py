@@ -31,7 +31,7 @@ from keras.models import Model
 def train_process(config):
     INIT_LR = 1e-4
     BS = 32
-    EPOCHS = 50
+    EPOCHS = 64
     # EPOCHS = 1
 
     # grab the list of images in our dataset directory, then initialize
