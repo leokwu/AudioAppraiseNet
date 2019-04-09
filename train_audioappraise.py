@@ -1,12 +1,9 @@
 # USAGE
 # python3.6 train_audioappraise.py --dataset /datasets/f0_classify --model audioappraise.model --le le.pickle
 
-# set the matplotlib backend so figures can be saved in the background
 import matplotlib
-
 matplotlib.use("Agg")
 
-# import the necessary packages
 from net.audioappraisenet import AudioAppraiseNet
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -34,8 +31,6 @@ def train_process(config):
     # EPOCHS = 128
     EPOCHS = 50
 
-    # grab the list of images in our dataset directory, then initialize
-    # the list of data (i.e., images) and class images
     print("[INFO] loading images...")
     imagePaths = list(paths.list_images(config.dataset))
     # print("imagePaths: ", imagePaths)
@@ -43,8 +38,6 @@ def train_process(config):
     labels = []
 
     for imagePath in imagePaths:
-        # extract the class label from the filename, load the image and
-        # resize it to be a fixed 32x32 pixels, ignoring aspect ratio
         label = imagePath.split(os.path.sep)[-2]
         # print(": ", imagePath.split(os.path.sep)[1])
         # print("os.path.sep: ", os.path.sep)
@@ -52,31 +45,22 @@ def train_process(config):
         image = cv2.imread(imagePath)
         # image = cv2.resize(image, (224, 224)) # mobilenetv2
         image = cv2.resize(image, (128, 128))
-        # update the data and labels lists, respectively
         data.append(image)
         labels.append(label)
 
-    # convert the data into a NumPy array, then preprocess it by scaling
-    # all pixel intensities to the range [0, 1]
     data = np.array(data, dtype="float") / 255.0
 
-    # encode the labels (which are currently strings) as integers and then
-    # one-hot encode them
     le = LabelEncoder()
     labels = le.fit_transform(labels)
     labels = np_utils.to_categorical(labels, 2)
 
-    # partition the data into training and testing splits using 75% of
-    # the data for training and the remaining 25% for testing
     (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.25, random_state=42)
 
-    # construct the training image generator for data augmentation
     aug = ImageDataGenerator()
     # aug = ImageDataGenerator(rotation_range=20, zoom_range=0.15,
     #                         width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15,
     #                         horizontal_flip=True, fill_mode="nearest")
 
-    # initialize the optimizer and model
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
     # mobilenetv2
@@ -95,7 +79,6 @@ def train_process(config):
                                                  verbose=0, save_best_only=False, save_weights_only=False, mode='auto',
                                                  period=1)
                  ]
-    # train the network
     print("len(trainX) // BS: ", len(trainX) // BS)
     print("[INFO] training network for {} epochs...".format(EPOCHS))
     H = model.fit_generator(aug.flow(trainX, trainY, batch_size=BS),
@@ -106,13 +89,11 @@ def train_process(config):
                             # use_multiprocessing=True,
                             callbacks=callbacks)
 
-    # evaluate the network
     print("[INFO] evaluating network...")
     predictions = model.predict(testX, batch_size=BS)
     print(classification_report(testY.argmax(axis=1),
                                 predictions.argmax(axis=1), target_names=le.classes_))
 
-    # save the network to disk
     print("[INFO] serializing network to '{}'...".format(config.model))
     model.save(config.model)
     model.save_weights('./weights/audioappraisenet_weights.h5')
@@ -130,7 +111,6 @@ def train_process(config):
     # intermediate_output = intermediate_layer_model.predict(testX, batch_size=BS)
     # print("intermediate_output: --------> ", intermediate_output)
 
-    # save the label encoder to disk
     f = open(config.le, "wb")
     f.write(pickle.dumps(le, True))
     f.close()
@@ -159,7 +139,6 @@ def train_process(config):
     print('\nTest Acc:', result[1])
     # print('\nTest Los:', result[0])
 
-    # plot the training loss and accuracy
     plt.style.use("ggplot")
     plt.figure()
     plt.plot(np.arange(0, EPOCHS), H.history["loss"], label="train_loss")
