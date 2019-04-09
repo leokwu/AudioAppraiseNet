@@ -31,8 +31,8 @@ from keras.models import Model
 def train_process(config):
     INIT_LR = 1e-4
     BS = 32
-    EPOCHS = 128
-    # EPOCHS = 1
+    # EPOCHS = 128
+    EPOCHS = 50
 
     # grab the list of images in our dataset directory, then initialize
     # the list of data (i.e., images) and class images
@@ -51,8 +51,7 @@ def train_process(config):
         # print("label: ", label)
         image = cv2.imread(imagePath)
         # image = cv2.resize(image, (224, 224)) # mobilenetv2
-        image = cv2.resize(image, (224, 224))
-
+        image = cv2.resize(image, (128, 128))
         # update the data and labels lists, respectively
         data.append(image)
         labels.append(label)
@@ -81,11 +80,12 @@ def train_process(config):
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
     # mobilenetv2
-    # model = AudioAppraiseNet.build_mobilenetv2(width=224, height=224, depth=3,
-    #                           classes=len(le.classes_), reg=l2(0.0004))
+    # model = AudioAppraiseNet.build_mobilenetv2(width=32, height=32, depth=3,
+    model = AudioAppraiseNet.build(width=128, height=128, depth=3,
+                               classes=len(le.classes_), reg=l2(0.0004))
     # inceptionv3
-    model = AudioAppraiseNet.build_inceptionv3(width=224, height=224, depth=3,
-                                               classes=len(le.classes_), reg=l2(0.0004))
+    # model = AudioAppraiseNet.build_inceptionv3(width=32, height=32, depth=3,
+    #                                           classes=len(le.classes_), reg=l2(0.0004))
     # model = multi_gpu_model(model, gpus=4)
     model.compile(loss="binary_crossentropy", optimizer=opt,
                   metrics=["accuracy"])
@@ -102,7 +102,7 @@ def train_process(config):
                             validation_data=(testX, testY),
                             steps_per_epoch=len(trainX) // BS,
                             epochs=EPOCHS,
-                            workers=10,
+                            # workers=10,
                             # use_multiprocessing=True,
                             callbacks=callbacks)
 
@@ -138,13 +138,14 @@ def train_process(config):
     print("input is: ", model.input.op.name)
     print("output is: ", model.output.op.name)
     # save pb model
-    sess = K.get_session()
-    frozen_graph_def = tf.graph_util.convert_variables_to_constants(
-        sess,
-        sess.graph_def,
-        output_node_names=["dense_6/Softmax"])
-    with tf.gfile.GFile('./model/audioappraisenet_model.pb', "wb") as f:
-        f.write(frozen_graph_def.SerializeToString())
+    # sess = K.get_session()
+    # frozen_graph_def = tf.graph_util.convert_variables_to_constants(
+    #    sess,
+    #    sess.graph_def,
+        # output_node_names=["dense_6/Softmax"])
+    #    output_node_names=["dense_5/Softmax"])
+    #with tf.gfile.GFile('./model/audioappraisenet_model.pb', "wb") as f:
+    #    f.write(frozen_graph_def.SerializeToString())
     # tf.train.write_graph(frozen_graph_def, 'model', 'audioappraisenet_model.pb', as_text=True)
     # tf.train.write_graph(frozen_graph_def, 'model', 'audioappraisenet_model.pb', as_text=False)
 

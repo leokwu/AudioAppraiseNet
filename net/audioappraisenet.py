@@ -25,24 +25,33 @@ class AudioAppraiseNet:
             inputShape = (depth, height, width)
             chanDim = 1
 
-        model.add(Conv2D(16, (3, 3), padding="same",
+        model.add(Conv2D(32, (3, 3), padding="same",
             input_shape=inputShape, kernel_initializer=init, kernel_regularizer=reg))
         model.add(BatchNormalization(axis=chanDim))
         model.add(Activation("relu"))
-        model.add(Conv2D(16, (3, 3), padding="same", kernel_initializer=init, kernel_regularizer=reg))
+        model.add(Conv2D(32, (3, 3), padding="same", kernel_initializer=init, kernel_regularizer=reg))
         model.add(BatchNormalization(axis=chanDim))
         model.add(Activation("relu"))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.25))
 
-        model.add(Conv2D(32, (3, 3), padding="same", kernel_initializer=init, kernel_regularizer=reg))
+        model.add(Conv2D(64, (3, 3), padding="same", kernel_initializer=init, kernel_regularizer=reg))
         model.add(BatchNormalization(axis=chanDim))
         model.add(Activation("relu"))
-        model.add(Conv2D(32, (3, 3), strides=(2, 2), padding="same", kernel_initializer=init, kernel_regularizer=reg))
+        model.add(Conv2D(64, (3, 3), strides=(2, 2), padding="same", kernel_initializer=init, kernel_regularizer=reg))
         model.add(BatchNormalization(axis=chanDim))
         model.add(Activation("relu"))
         # model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.25))
+        # for i in range(25):
+        model.add(Conv2D(64, (3, 3), padding="same", kernel_initializer=init, kernel_regularizer=reg))
+        model.add(BatchNormalization(axis=chanDim))
+        model.add(Activation("relu"))
+        model.add(Conv2D(64, (3, 3), padding="same", kernel_initializer=init, kernel_regularizer=reg))
+        model.add(BatchNormalization(axis=chanDim))
+        model.add(Activation("relu"))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Dropout(0.25))
 
         model.add(Conv2D(64, (3, 3), padding="same", kernel_initializer=init, kernel_regularizer=reg))
         model.add(BatchNormalization(axis=chanDim))
@@ -52,6 +61,7 @@ class AudioAppraiseNet:
         model.add(Activation("relu"))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.25))
+
 
         model.add(Flatten())
         model.add(Dense(128, kernel_initializer=init, kernel_regularizer=reg))
@@ -71,27 +81,27 @@ class AudioAppraiseNet:
         if K.image_data_format() == "channels_first":
             inputShape = (depth, height, width)
             chanDim = 1
-        input_tensor = Input(shape=inputShape)
+        input_shape = Input(shape=inputShape)
         base_model = MobileNetV2(include_top=False, weights='imagenet')
         x = base_model.output
         x = GlobalAveragePooling2D()(x)
-        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
-        x = BatchNormalization()(x)
-        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
-        x = BatchNormalization()(x)
-        x = Dropout(0.25)(x)
-        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
-        x = BatchNormalization()(x)
-        x = Dense(512, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
-        x = BatchNormalization()(x)
-        x = Dropout(0.5)(x)
+        # x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        # x = BatchNormalization()(x)
+        # x = Dense(1024, activation='relu')(x)
+        # x = BatchNormalization()(x)
+        # x = Dropout(0.25)(x)
+        # x = Dense(1024, activation='relu')(x)
+        # x = BatchNormalization()(x)
+        # x = Dense(512, activation='relu')(x)
+        # x = BatchNormalization()(x)
+        # x = Dropout(0.5)(x)
         predictions = Dense(classes, activation='softmax')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         for i, layer in enumerate(base_model.layers):
             print(i, layer.name)
-        for layer in model.layers[:11]:
+        for layer in model.layers[:154]:
             layer.trainable = False
-        for layer in model.layers[11:]:
+        for layer in model.layers[154:]:
             layer.trainable = True
         return model
 
