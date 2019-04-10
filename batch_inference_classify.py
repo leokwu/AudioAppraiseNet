@@ -1,5 +1,5 @@
 # USAGE
-# python3.6 inference_audioappraise.py --model audioappraise.model --le le.pickle --classify classify/f0 --select classify/wav --output output/good
+# python3.6 batch_inference_classify.py --model audioappraise.model --le le.pickle --classify classify/f0 --select classify/wav --output output/good
 
 # import the necessary packages
 from keras.preprocessing.image import img_to_array
