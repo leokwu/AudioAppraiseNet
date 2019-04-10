@@ -1,5 +1,5 @@
 # USAGE
-# python3.6 inference_audioappraise.py --model audioappraise.model --le le.pickle --classify classify/f0 --select classify/wav --output output
+# python3.6 inference_audioappraise.py --model audioappraise.model --le le.pickle --classify classify/f0 --select classify/wav --output output/good
 
 # import the necessary packages
 from keras.preprocessing.image import img_to_array
@@ -45,7 +45,7 @@ def inference(config):
 			# print(prename)
 			fullname = f'{config.select}/{prename}.wav'
 			print(fullname)
-			cmd = f'mv {fullname} {config.output}'
+			cmd = f'cp {fullname} {config.output}'
 			os.system(cmd)
 
 if __name__ == '__main__':
