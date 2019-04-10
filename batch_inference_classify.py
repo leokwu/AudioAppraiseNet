@@ -39,7 +39,7 @@ def inference(config):
 		# print("\nj: ", j)
 		label = le.classes_[j]
 		# print("\nlabel: ", label)
-		if label == 'bad':
+		if label == 'good':
 			# print(imagePath)
 			prename = imagePath.split(os.path.sep)[-1].split('.')[0]
 			# print(prename)
