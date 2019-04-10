@@ -44,6 +44,7 @@ def inference(config):
 			prename = imagePath.split(os.path.sep)[-1].split('.')[0]
 			# print(prename)
 			fullname = f'{config.select}/{prename}.wav'
+			print("\npreds: ", model.predict(f0_frame)[0])
 			print(fullname)
 			cmd = f'cp {fullname} {config.output}'
 			os.system(cmd)
