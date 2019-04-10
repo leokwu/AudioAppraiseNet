@@ -41,7 +41,7 @@ def inference(config):
 		# print("\nlabel: ", label)
 		if label == 'bad':
 			# print(imagePath)
-			prename = imagePath.split(os.path.sep)[2].split('.')[0]
+			prename = imagePath.split(os.path.sep)[-1].split('.')[0]
 			# print(prename)
 			fullname = f'{config.select}/{prename}.wav'
 			print(fullname)
