@@ -88,7 +88,6 @@ class AudioAppraiseNet:
         for layer in base_model.layers:
             layer.trainable = False
         x = base_model.output
-        x = GlobalAveragePooling2D()(x)
         x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
         x = BatchNormalization()(x)
         x = Dense(1024, activation='relu')(x)
@@ -117,9 +116,12 @@ class AudioAppraiseNet:
             inputShape = (depth, height, width)
             chanDim = 1
         input_tensor = Input(shape=inputShape)
-        base_model = InceptionV3(include_top=False, weights='imagenet')
+        base_model = InceptionV3(include_top=False, weights='imagenet', input_tensor=input_tensor, input_shape=inputShape, pooling='avg')
+        for i, layer in enumerate(base_model.layers):
+            print(i, layer.name)
+        for layer in base_model.layers:
+            layer.trainable = False
         x = base_model.output
-        x = GlobalAveragePooling2D()(x)
         x = Dense(512, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
         x = BatchNormalization()(x)
         x = Dropout(0.25)(x)
@@ -136,10 +138,10 @@ class AudioAppraiseNet:
         x = Dropout(0.5)(x)
         predictions = Dense(classes, activation='softmax')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
-        for i, layer in enumerate(base_model.layers):
-            print(i, layer.name)
-        for layer in model.layers[:249]:
-            layer.trainable = False
-        for layer in model.layers[249:]:
-            layer.trainable = True
+        # for i, layer in enumerate(base_model.layers):
+        #     print(i, layer.name)
+        # for layer in model.layers[:249]:
+        #     layer.trainable = False
+        # for layer in model.layers[249:]:
+        #     layer.trainable = True
         return model
