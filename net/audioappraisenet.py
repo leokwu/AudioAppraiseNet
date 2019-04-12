@@ -81,28 +81,32 @@ class AudioAppraiseNet:
         if K.image_data_format() == "channels_first":
             inputShape = (depth, height, width)
             chanDim = 1
-        input_shape = Input(shape=inputShape)
-        base_model = MobileNetV2(include_top=False, weights='imagenet')
-        x = base_model.output
-        x = GlobalAveragePooling2D()(x)
-        # x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
-        # x = BatchNormalization()(x)
-        # x = Dense(1024, activation='relu')(x)
-        # x = BatchNormalization()(x)
-        # x = Dropout(0.25)(x)
-        # x = Dense(1024, activation='relu')(x)
-        # x = BatchNormalization()(x)
-        # x = Dense(512, activation='relu')(x)
-        # x = BatchNormalization()(x)
-        # x = Dropout(0.5)(x)
-        predictions = Dense(classes, activation='softmax')(x)
-        model = Model(inputs=base_model.input, outputs=predictions)
+        input_tensor = Input(shape=inputShape)
+        base_model = MobileNetV2(include_top=False, weights='imagenet', input_tensor=input_tensor, input_shape=inputShape, pooling='avg')
         for i, layer in enumerate(base_model.layers):
             print(i, layer.name)
-        for layer in model.layers[:154]:
+        for layer in base_model.layers:
             layer.trainable = False
-        for layer in model.layers[154:]:
-            layer.trainable = True
+        x = base_model.output
+        x = GlobalAveragePooling2D()(x)
+        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dense(1024, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.25)(x)
+        x = Dense(1024, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dense(512, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.5)(x)
+        predictions = Dense(classes, activation='softmax')(x)
+        model = Model(inputs=base_model.input, outputs=predictions)
+        # for i, layer in enumerate(base_model.layers):
+        #     print(i, layer.name)
+        # for layer in model.layers[:154]:
+        #     layer.trainable = False
+        # for layer in model.layers[154:]:
+        #     layer.trainable = True
         return model
 
     @staticmethod
