@@ -65,8 +65,8 @@ def train_process(config):
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
     # mobilenetv2
-    model = AudioAppraiseNet.build_mobilenetv2(width=128, height=128, depth=3,
-    # model = AudioAppraiseNet.build(width=300, height=300, depth=3,
+    # model = AudioAppraiseNet.build_mobilenetv2(width=128, height=128, depth=3,
+    model = AudioAppraiseNet.build(width=128, height=128, depth=3,
                                classes=len(le.classes_), reg=l2(0.0004))
     # inceptionv3
     # model = AudioAppraiseNet.build_inceptionv3(width=32, height=32, depth=3,
