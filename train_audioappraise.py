@@ -28,8 +28,8 @@ from keras.models import Model
 def train_process(config):
     INIT_LR = 1e-4
     BS = 32
-    # EPOCHS = 128
-    EPOCHS = 50
+    EPOCHS = 128
+    # EPOCHS = 50
 
     print("[INFO] loading images...")
     imagePaths = list(paths.list_images(config.dataset))
@@ -43,7 +43,7 @@ def train_process(config):
         # print("os.path.sep: ", os.path.sep)
         # print("label: ", label)
         image = cv2.imread(imagePath)
-        # image = cv2.resize(image, (224, 224)) # mobilenetv2
+        # image = cv2.resize(image, (224, 224)) # mobilenetv2 (96, 96) (128, 128) (160, 160) (192, 192) (224, 224)
         image = cv2.resize(image, (128, 128))
         data.append(image)
         labels.append(label)
@@ -56,16 +56,17 @@ def train_process(config):
 
     (trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.25, random_state=42)
 
-    aug = ImageDataGenerator()
+    # aug = ImageDataGenerator()
     # aug = ImageDataGenerator(rotation_range=20, zoom_range=0.15,
-    #                         width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15,
-    #                         horizontal_flip=True, fill_mode="nearest")
+    aug = ImageDataGenerator(zoom_range=0.15,
+                             width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15,
+                             horizontal_flip=True, fill_mode="nearest")
 
     print("[INFO] compiling model...")
     opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
     # mobilenetv2
-    # model = AudioAppraiseNet.build_mobilenetv2(width=32, height=32, depth=3,
-    model = AudioAppraiseNet.build(width=128, height=128, depth=3,
+    model = AudioAppraiseNet.build_mobilenetv2(width=128, height=128, depth=3,
+    # model = AudioAppraiseNet.build(width=300, height=300, depth=3,
                                classes=len(le.classes_), reg=l2(0.0004))
     # inceptionv3
     # model = AudioAppraiseNet.build_inceptionv3(width=32, height=32, depth=3,
