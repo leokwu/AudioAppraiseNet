@@ -3,6 +3,7 @@ from keras.models import Sequential
 from keras.models import Model
 from keras.applications.inception_v3 import InceptionV3
 from keras.applications.mobilenet_v2 import MobileNetV2
+from keras.applications.mobilenet import MobileNet
 from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
@@ -73,6 +74,42 @@ class AudioAppraiseNet:
         model.add(Activation("softmax"))
 
         return model
+
+    @staticmethod
+    def build_mobilenetv1(width, height, depth, classes, reg, init="he_normal"):
+        inputShape = (height, width, depth)
+        chanDim = -1
+        if K.image_data_format() == "channels_first":
+            inputShape = (depth, height, width)
+            chanDim = 1
+        input_tensor = Input(shape=inputShape)
+        base_model = MobileNet(include_top=False, weights='imagenet', input_tensor=input_tensor,
+                                 input_shape=inputShape, pooling='avg')
+        for i, layer in enumerate(base_model.layers):
+            print(i, layer.name)
+        for layer in base_model.layers:
+            layer.trainable = False
+        x = base_model.output
+        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dense(1024, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.25)(x)
+        x = Dense(1024, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dense(512, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.5)(x)
+        predictions = Dense(classes, activation='softmax')(x)
+        model = Model(inputs=base_model.input, outputs=predictions)
+        # for i, layer in enumerate(base_model.layers):
+        #     print(i, layer.name)
+        # for layer in model.layers[:154]:
+        #     layer.trainable = False
+        # for layer in model.layers[154:]:
+        #     layer.trainable = True
+        return model
+
 
     @staticmethod
     def build_mobilenetv2(width, height, depth, classes, reg, init="he_normal"):
