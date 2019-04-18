@@ -124,19 +124,30 @@ class AudioAppraiseNet:
             print(i, layer.name)
         for layer in base_model.layers:
             layer.trainable = False
-        x = base_model.output
-        x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
-        x = BatchNormalization()(x)
-        x = Dense(1024, activation='relu')(x)
-        x = BatchNormalization()(x)
-        x = Dropout(0.25)(x)
-        x = Dense(1024, activation='relu')(x)
-        x = BatchNormalization()(x)
-        x = Dense(512, activation='relu')(x)
-        x = BatchNormalization()(x)
-        x = Dropout(0.5)(x)
-        predictions = Dense(classes, activation='softmax')(x)
-        model = Model(inputs=base_model.input, outputs=predictions)
+        model = Sequential()
+        model.add(base_model)
+        model.add(Flatten())
+        model.add(Dense(128, kernel_initializer=init, kernel_regularizer=reg))
+        model.add(BatchNormalization())
+        model.add(Activation("relu"))
+        model.add(Dropout(0.5))
+
+        model.add(Dense(classes))
+        model.add(Activation("softmax"))
+        # x = base_model.output
+        # x = Dense(1024, kernel_initializer=init, kernel_regularizer=reg, activation='relu')(x)
+        # x = BatchNormalization()(x)
+        # x = Dense(1024, activation='relu')(x)
+        # x = BatchNormalization()(x)
+        # x = Dropout(0.25)(x)
+        # x = Dense(1024, activation='relu')(x)
+        # x = BatchNormalization()(x)
+        # x = Dense(512, activation='relu')(x)
+        # x = BatchNormalization()(x)
+        # x = Dropout(0.5)(x)
+        # predictions = Dense(classes, activation='softmax')(x)
+        # model = Model(inputs=base_model.input, outputs=predictions)
+        model.summary()
         # for i, layer in enumerate(base_model.layers):
         #     print(i, layer.name)
         # for layer in model.layers[:154]:
